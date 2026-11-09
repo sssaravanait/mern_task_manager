@@ -1,0 +1,33 @@
+name: mern-tasks
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: mern-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: mern-api
+    init: true                      # Forwards signals so graceful shutdown works
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGO_URI: mongodb://mongo:27017/mern_tasks   # "mongo" is the service name on the Docker network
+      CLIENT_ORIGIN: http://localhost:5173
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server/src:/app/server/src   # Hot reload: edits on the host reach the container
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:
