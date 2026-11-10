@@ -2,7 +2,8 @@
     "name": "mern-tasks",
     "private": true,
     "workspaces": [
-        "server"
+        "server",
+        "client"
     ],
     "engines": {
         "node": ">=24"

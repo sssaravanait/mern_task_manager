@@ -10,11 +10,12 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  api:
+  server:
     build:
       context: .
       dockerfile: server/Dockerfile
-    container_name: mern-api
+      target: dev
+    container_name: mern-server
     init: true                      # Forwards signals so graceful shutdown works
     restart: unless-stopped
     environment:
@@ -28,6 +29,19 @@ services:
       - ./server/src:/app/server/src   # Hot reload: edits on the host reach the container
     depends_on:
       - mongo
+
+  client:
+    build:
+      context: .                    # project root, so workspaces are visible
+      dockerfile: client/Dockerfile
+      target: dev
+      args:
+        VITE_API_URL: http://localhost:5000/api
+    container_name: mern-client
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
 
 volumes:
   mongo-data:
